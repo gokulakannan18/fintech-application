@@ -17,16 +17,35 @@ interface Filters {
   sortOrder: 'asc' | 'desc';
 }
 
+interface MockUser {
+  email: string;
+  password: string;
+  role: 'admin' | 'viewer';
+}
+
+const MOCK_USERS: MockUser[] = [
+  { email: 'admin@test.com', password: '1234', role: 'admin' },
+  { email: 'viewer@test.com', password: '1234', role: 'viewer' },
+];
+
+interface AuthUser {
+  email: string;
+  role: 'admin' | 'viewer';
+}
+
 interface AppState {
   transactions: Transaction[];
   filters: Filters;
   role: 'admin' | 'viewer';
   darkMode: boolean;
+  user: AuthUser | null;
+  isAuthenticated: boolean;
   addTransaction: (t: Omit<Transaction, 'id'>) => void;
   deleteTransaction: (id: string) => void;
-  setRole: (role: 'admin' | 'viewer') => void;
   setFilters: (filters: Partial<Filters>) => void;
   toggleDarkMode: () => void;
+  login: (email: string, password: string) => boolean;
+  logout: () => void;
 }
 
 const mockTransactions: Transaction[] = [
@@ -51,6 +70,8 @@ export const useStore = create<AppState>()(
       filters: { search: '', type: 'all', sortBy: 'date', sortOrder: 'desc' },
       role: 'admin',
       darkMode: false,
+      user: null,
+      isAuthenticated: false,
       addTransaction: (t) =>
         set((state) => ({
           transactions: [{ ...t, id: crypto.randomUUID() }, ...state.transactions],
@@ -59,7 +80,6 @@ export const useStore = create<AppState>()(
         set((state) => ({
           transactions: state.transactions.filter((t) => t.id !== id),
         })),
-      setRole: (role) => set({ role }),
       setFilters: (filters) =>
         set((state) => ({ filters: { ...state.filters, ...filters } })),
       toggleDarkMode: () =>
@@ -68,6 +88,13 @@ export const useStore = create<AppState>()(
           document.documentElement.classList.toggle('dark', next);
           return { darkMode: next };
         }),
+      login: (email, password) => {
+        const found = MOCK_USERS.find((u) => u.email === email && u.password === password);
+        if (!found) return false;
+        set({ user: { email: found.email, role: found.role }, isAuthenticated: true, role: found.role });
+        return true;
+      },
+      logout: () => set({ user: null, isAuthenticated: false, role: 'admin' }),
     }),
     { name: 'finance-dashboard' }
   )
