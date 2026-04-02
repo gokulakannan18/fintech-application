@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight } from 'react-icons/hi';
 
-export default function Login() {
+export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,8 +22,7 @@ export default function Login() {
     }
 
     setLoading(true);
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 500));
 
     const success = login(email.trim(), password);
     if (success) {
@@ -46,8 +45,8 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl gradient-bg mb-4">
             <HiOutlineLockClosed className="w-7 h-7 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold gradient-text">FinDash</h1>
-          <p className="text-muted-foreground text-sm mt-1">Sign in to your account</p>
+          <h1 className="text-2xl font-bold gradient-text">Welcome back</h1>
+          <p className="text-muted-foreground text-sm mt-1">Sign in to continue to your dashboard</p>
         </div>
 
         <div className="glass-card p-6 sm:p-8">
@@ -70,7 +69,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@test.com"
+                  placeholder="you@example.com"
                   className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg bg-muted text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                 />
               </div>
@@ -84,7 +83,7 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••"
+                  placeholder="Enter your password"
                   className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg bg-muted text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                 />
               </div>
@@ -100,21 +99,12 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-border">
-            <p className="text-xs text-muted-foreground text-center mb-3">Demo accounts</p>
-            <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-              <div className="bg-muted/50 rounded-lg p-2.5">
-                <p className="font-medium text-foreground">Admin</p>
-                <p>admin@test.com</p>
-                <p>1234</p>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-2.5">
-                <p className="font-medium text-foreground">Viewer</p>
-                <p>viewer@test.com</p>
-                <p>1234</p>
-              </div>
-            </div>
-          </div>
+          <p className="text-sm text-muted-foreground text-center mt-6">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-primary font-medium hover:underline">
+              Sign Up
+            </Link>
+          </p>
         </div>
       </motion.div>
     </div>
