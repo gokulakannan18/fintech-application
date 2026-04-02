@@ -70,6 +70,8 @@ export const useStore = create<AppState>()(
       filters: { search: '', type: 'all', sortBy: 'date', sortOrder: 'desc' },
       role: 'admin',
       darkMode: false,
+      user: null,
+      isAuthenticated: false,
       addTransaction: (t) =>
         set((state) => ({
           transactions: [{ ...t, id: crypto.randomUUID() }, ...state.transactions],
@@ -78,7 +80,6 @@ export const useStore = create<AppState>()(
         set((state) => ({
           transactions: state.transactions.filter((t) => t.id !== id),
         })),
-      setRole: (role) => set({ role }),
       setFilters: (filters) =>
         set((state) => ({ filters: { ...state.filters, ...filters } })),
       toggleDarkMode: () =>
@@ -87,6 +88,13 @@ export const useStore = create<AppState>()(
           document.documentElement.classList.toggle('dark', next);
           return { darkMode: next };
         }),
+      login: (email, password) => {
+        const found = MOCK_USERS.find((u) => u.email === email && u.password === password);
+        if (!found) return false;
+        set({ user: { email: found.email, role: found.role }, isAuthenticated: true, role: found.role });
+        return true;
+      },
+      logout: () => set({ user: null, isAuthenticated: false, role: 'admin' }),
     }),
     { name: 'finance-dashboard' }
   )
