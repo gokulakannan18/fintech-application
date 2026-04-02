@@ -17,16 +17,35 @@ interface Filters {
   sortOrder: 'asc' | 'desc';
 }
 
+interface MockUser {
+  email: string;
+  password: string;
+  role: 'admin' | 'viewer';
+}
+
+const MOCK_USERS: MockUser[] = [
+  { email: 'admin@test.com', password: '1234', role: 'admin' },
+  { email: 'viewer@test.com', password: '1234', role: 'viewer' },
+];
+
+interface AuthUser {
+  email: string;
+  role: 'admin' | 'viewer';
+}
+
 interface AppState {
   transactions: Transaction[];
   filters: Filters;
   role: 'admin' | 'viewer';
   darkMode: boolean;
+  user: AuthUser | null;
+  isAuthenticated: boolean;
   addTransaction: (t: Omit<Transaction, 'id'>) => void;
   deleteTransaction: (id: string) => void;
-  setRole: (role: 'admin' | 'viewer') => void;
   setFilters: (filters: Partial<Filters>) => void;
   toggleDarkMode: () => void;
+  login: (email: string, password: string) => boolean;
+  logout: () => void;
 }
 
 const mockTransactions: Transaction[] = [
