@@ -1,5 +1,5 @@
-import { useStore } from '@/store/useStore';
 import { useNavigate } from 'react-router-dom';
+import { useStore } from '@/store/useStore';
 import { HiOutlineMoon, HiOutlineSun, HiOutlineLogout, HiOutlineUser } from 'react-icons/hi';
 
 export default function Navbar() {
@@ -8,7 +8,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login', { replace: true });
+    navigate('/signin', { replace: true });
   };
 
   return (
@@ -18,8 +18,8 @@ export default function Navbar() {
 
       <div className="flex items-center gap-3">
         {user && (
-          <span className="text-xs font-medium text-muted-foreground hidden sm:block">
-            {user.email}
+          <span className="text-xs font-medium text-muted-foreground hidden sm:block truncate max-w-[160px]">
+            {user.name}
           </span>
         )}
 
@@ -35,7 +35,7 @@ export default function Navbar() {
           <HiOutlineUser className="w-4 h-4 text-primary-foreground" />
         </div>
 
-        <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Logout">
+        <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Sign out">
           <HiOutlineLogout className="w-5 h-5" />
         </button>
       </div>

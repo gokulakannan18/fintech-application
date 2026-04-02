@@ -17,21 +17,17 @@ interface Filters {
   sortOrder: 'asc' | 'desc';
 }
 
-interface MockUser {
+export interface AuthUser {
+  name: string;
   email: string;
+  role: 'admin' | 'viewer';
+}
+
+interface StoredUser extends AuthUser {
   password: string;
-  role: 'admin' | 'viewer';
 }
 
-const MOCK_USERS: MockUser[] = [
-  { email: 'admin@test.com', password: '1234', role: 'admin' },
-  { email: 'viewer@test.com', password: '1234', role: 'viewer' },
-];
-
-interface AuthUser {
-  email: string;
-  role: 'admin' | 'viewer';
-}
+const ADMIN_EMAIL = 'admin@findash.com';
 
 interface AppState {
   transactions: Transaction[];
@@ -39,11 +35,13 @@ interface AppState {
   role: 'admin' | 'viewer';
   darkMode: boolean;
   user: AuthUser | null;
+  users: StoredUser[];
   isAuthenticated: boolean;
   addTransaction: (t: Omit<Transaction, 'id'>) => void;
   deleteTransaction: (id: string) => void;
   setFilters: (filters: Partial<Filters>) => void;
   toggleDarkMode: () => void;
+  signup: (name: string, email: string, password: string) => { success: boolean; error?: string };
   login: (email: string, password: string) => boolean;
   logout: () => void;
 }
@@ -63,14 +61,22 @@ const mockTransactions: Transaction[] = [
   { id: '12', date: '2026-03-02', amount: 90, category: 'Health', type: 'expense', description: 'Gym membership' },
 ];
 
+const defaultAdmin: StoredUser = {
+  name: 'Admin',
+  email: ADMIN_EMAIL,
+  password: 'admin123',
+  role: 'admin',
+};
+
 export const useStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       transactions: mockTransactions,
       filters: { search: '', type: 'all', sortBy: 'date', sortOrder: 'desc' },
-      role: 'admin',
+      role: 'viewer',
       darkMode: false,
       user: null,
+      users: [defaultAdmin],
       isAuthenticated: false,
       addTransaction: (t) =>
         set((state) => ({
@@ -88,13 +94,27 @@ export const useStore = create<AppState>()(
           document.documentElement.classList.toggle('dark', next);
           return { darkMode: next };
         }),
+      signup: (name, email, password) => {
+        const { users } = get();
+        if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
+          return { success: false, error: 'An account with this email already exists.' };
+        }
+        const role: 'admin' | 'viewer' = email.toLowerCase() === ADMIN_EMAIL ? 'admin' : 'viewer';
+        const newUser: StoredUser = { name, email, password, role };
+        const authUser: AuthUser = { name, email, role };
+        set({ users: [...users, newUser], user: authUser, isAuthenticated: true, role });
+        return { success: true };
+      },
       login: (email, password) => {
-        const found = MOCK_USERS.find((u) => u.email === email && u.password === password);
+        const { users } = get();
+        const found = users.find(
+          (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+        );
         if (!found) return false;
-        set({ user: { email: found.email, role: found.role }, isAuthenticated: true, role: found.role });
+        set({ user: { name: found.name, email: found.email, role: found.role }, isAuthenticated: true, role: found.role });
         return true;
       },
-      logout: () => set({ user: null, isAuthenticated: false, role: 'admin' }),
+      logout: () => set({ user: null, isAuthenticated: false, role: 'viewer' }),
     }),
     { name: 'finance-dashboard' }
   )
