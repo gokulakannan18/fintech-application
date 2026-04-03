@@ -1,5 +1,6 @@
 import type { Transaction } from '@/store/useStore';
 
+
 export function exportTransactionsCSV(transactions: Transaction[]) {
   const headers = ['Date', 'Description', 'Category', 'Type', 'Amount'];
   const rows = transactions.map((t) => [t.date, t.description, t.category, t.type, t.amount.toString()]);
