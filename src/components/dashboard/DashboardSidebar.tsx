@@ -10,6 +10,7 @@ import {
   HiOutlineMenu,
 } from 'react-icons/hi';
 
+
 const navItems = [
   { id: 'overview', label: 'Overview', icon: HiOutlineHome },
   { id: 'transactions', label: 'Transactions', icon: HiOutlineCreditCard },
